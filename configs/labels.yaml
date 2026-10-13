@@ -1,0 +1,131 @@
+# Label normalisation, applied identically to the reference and to every detector.
+# Strict metrics compare NORMALISED categories, at the granularity the de-id policy acts on.
+# The original ("fine") label is kept on every entity for diagnostics.
+# Approved 2026-10-12 (docs/02_model_assessment.md, section 5).
+
+categories: [PERSON, DATE, TIME, AGE, ORGANIZATION, LOCATION, PHONE, EMAIL, ID, OTHER_PHI]
+
+# ---------------------------------------------------------------- reference
+reference:
+  map:
+    PATIENT_NAME: PERSON
+    DOCTOR_NAME: PERSON
+    HEALTHCARE_PROVIDER: PERSON        # spans are person-name shaped (docs/01 section 2.4)
+    SURGEON_NAME: PERSON
+    AUTOMATED_NAME: PERSON
+    BREACH_NAME: PERSON
+    DATE: DATE
+    DATE_OF_BIRTH: DATE
+    DATETIME: DATE
+    TIMESTAMP: DATE
+    AUTOMATED_DATE: DATE
+    TIME: TIME
+    AGE: AGE
+    HOSPITAL: ORGANIZATION
+    ORGANIZATION: ORGANIZATION
+    ADDRESS: LOCATION
+    CITY: LOCATION
+    STATE: LOCATION
+    PHONE: PHONE
+    EMAIL: EMAIL
+    SSN: ID
+    MRN: ID
+    DOCTOR_ID: ID
+    HOSPITAL_ID: ID
+    INSURANCE_ID: ID
+    PATIENT_ID: ID
+    UNIT_NUMBER: ID
+    OTHER_PHI: OTHER_PHI
+  # Not PHI under the project policy; reference spans become ignore regions (counted, not scored).
+  excluded: [SEX]
+  # Corrupted placeholders: a stray letter fused into the label, e.g. "[XPATIENT_NAME]", "[XATIENT_NAME]".
+  corrupted_patterns:
+    "^[A-Z]?P?ATIENT_NAME$": PATIENT_NAME
+  # Any other bracketed upper-case token that is not a known label is treated as a reference error
+  # (often a leaked value) and becomes an ignore region.
+  # Content rule (found on the VALIDATION split, 2026-10-12): the reference labels time-only strings
+  # such as "06:20AM" as DATETIME 229 times and as TIME 261 times. A DATETIME/TIMESTAMP span with no
+  # date component is therefore normalised to TIME; with a date component it stays DATE.
+  time_only_to_time: [DATETIME, TIMESTAMP]
+
+# ---------------------------------------------------------------- models
+# Keys are entity types after stripping the tag prefix (B-/I-/L-/U-). Types mapped to null are dropped.
+models:
+  nemotron_pii:            # OpenMed PII models (M1-M3)
+    first_name: PERSON
+    last_name: PERSON
+    date: DATE
+    date_of_birth: DATE
+    date_time: DATE
+    time: TIME
+    age: AGE
+    company_name: ORGANIZATION
+    street_address: LOCATION
+    city: LOCATION
+    state: LOCATION
+    county: LOCATION
+    postcode: LOCATION
+    country: LOCATION
+    coordinate: OTHER_PHI
+    phone_number: PHONE
+    fax_number: PHONE
+    email: EMAIL
+    ssn: ID
+    medical_record_number: ID
+    health_plan_beneficiary_number: ID
+    account_number: ID
+    customer_id: ID
+    employee_id: ID
+    certificate_license_number: ID
+    unique_id: ID
+    device_identifier: ID
+    vehicle_identifier: ID
+    license_plate: ID
+    tax_id: ID
+    credit_debit_card: ID
+    url: OTHER_PHI
+    ipv4: OTHER_PHI
+    ipv6: OTHER_PHI
+    mac_address: OTHER_PHI
+    user_name: OTHER_PHI
+    biometric_identifier: OTHER_PHI
+    # credentials: not expected in notes, kept as OTHER_PHI (fail safe)
+    password: OTHER_PHI
+    pin: OTHER_PHI
+    cvv: OTHER_PHI
+    api_key: OTHER_PHI
+    http_cookie: OTHER_PHI
+    swift_bic: OTHER_PHI
+    bank_routing_number: OTHER_PHI
+    # demographic attributes: not identifiers under the policy
+    gender: null
+    race_ethnicity: null
+    religious_belief: null
+    political_view: null
+    sexuality: null
+    occupation: null
+    education_level: null
+    employment_status: null
+    language: null
+    blood_type: null
+  i2b2_2014:               # obi models (M4)
+    PATIENT: PERSON
+    STAFF: PERSON
+    DATE: DATE
+    AGE: AGE
+    HOSP: ORGANIZATION
+    PATORG: ORGANIZATION
+    LOC: LOCATION
+    PHONE: PHONE
+    EMAIL: EMAIL
+    ID: ID
+    OTHERPHI: OTHER_PHI
+  stanford_deid:           # StanfordAIMI models (M5)
+    PATIENT: PERSON
+    HCW: PERSON
+    DATE: DATE
+    AGE: AGE
+    HOSPITAL: ORGANIZATION
+    VENDOR: ORGANIZATION
+    PHONE: PHONE
+    ID: ID

@@ -1,0 +1,37 @@
+# --- Private data: never commit clinical text or anything derived from it ---
+*.zip
+data/input/
+data/processed/
+results/**/predictions/
+results/**/wordscores/
+results/**/deid_outputs/
+results/**/*.private.*
+# experiment outputs are large and regenerable; summaries are in docs/ and REPORT.md
+results/
+# external dataset: re-downloaded by scripts/fetch_gretel_test.py (Apache-2.0)
+data/external/
+# assignment brief: not part of the code
+prompt.txt
+
+# --- Model weights and caches ---
+.cache/
+*.safetensors
+*.bin
+*.onnx
+*.pt
+
+# --- Secrets (pseudonymisation / date-shift keys) ---
+*.key
+.env
+secrets/
+
+# --- Python / tooling ---
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+# detailed working reports: kept locally, summarised in REPORT.md
+docs/

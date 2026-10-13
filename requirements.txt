@@ -1,0 +1,16 @@
+# CPU-only environment. Tested with Python 3.13.7 on Windows 11.
+# torch is expected to be installed already (CPU build). If it is not:
+#   pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
+torch>=2.6,<3            # >=2.6 required by transformers to load legacy .bin weights safely
+transformers==4.57.6
+tokenizers>=0.22,<0.23
+safetensors>=0.4
+huggingface_hub>=0.34,<1.0
+numpy>=2.0,<3
+pandas>=2.2,<3
+PyYAML>=6.0,<7
+psutil>=7.0,<8
+pytest>=8.0,<10
+# Optional: CPU optimisation (Section 11; ONNX export + int8 quantisation)
+# onnxruntime==1.31.0
+# onnx>=1.17

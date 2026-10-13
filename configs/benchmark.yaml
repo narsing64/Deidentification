@@ -1,0 +1,24 @@
+# Experiment configuration. All paths are relative to the project root.
+
+data:
+  annotated_csv: data/input/NLPH_A1_De_Identification_Dataset/test/test.csv
+  annotations_jsonl: data/input/NLPH_A1_De_Identification_Dataset/test/annotations.jsonl
+  unlabelled_tsv: data/input/NLPH_A1_De_Identification_Dataset/train.tsv
+  processed_dir: data/processed
+
+split:
+  seed: 20261012
+  validation_fraction: 0.40          # approved: ~40% validation / ~60% held-out test
+  stratify_by: [source, tier]
+  group_by_patient_name_hash: true   # keep notes sharing a (hashed) patient name together
+
+evaluation:
+  bootstrap_resamples: 1000
+  bootstrap_seed: 7
+  confidence: 0.95
+
+# Shared detection/fusion settings live in configs/detection.yaml.
+
+speed:
+  unlabelled_sample_size: 50         # train.tsv notes used for latency/throughput (seeded sample)
+  warmup_notes: 2

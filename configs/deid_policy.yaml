@@ -1,0 +1,54 @@
+# De-identification policy: what happens to each DETECTED category. Detection is separate.
+#
+# Intended standard: HIPAA Safe Harbor-oriented. All 18 identifier types are removed or transformed,
+# including all date elements except the year (handled here by date shifting, see below), and ages
+# over 89. Times and healthcare-provider names are also treated as PHI, matching the reference
+# annotations. Date shifting and keyed pseudonyms are NOT literal Safe Harbor (which requires
+# removal). They are a common research compromise that preserves temporal relations and linkage, and
+# they require a documented expert-determination or governance decision. Switch DATE to
+# `placeholder` and PERSON/ID to `placeholder` for strict removal.
+#
+# Actions: redact | mask | placeholder | pseudonymize | date_shift | retain
+#   redact       -> fixed marker (`replacement`, default "[REDACTED]")
+#   placeholder  -> "[<CATEGORY>]" (or `replacement`)
+#   mask         -> hide characters, keep `keep_first` / `keep_last` letters/digits; punctuation kept
+#   pseudonymize -> "<prefix>_<8 hex>" from HMAC-SHA256(secret key, category + normalised value):
+#                   the same value maps to the same token across notes and runs that share the key
+#   date_shift   -> parse and shift by a per-scope offset in [min_days, max_days]; output keeps the
+#                   input format; unparseable dates fall back to `fallback` and are flagged for review
+#   retain       -> unchanged; ONLY permitted for categories listed in `retain_allowed`
+
+key:
+  env_var: DEID_SECRET_KEY      # hex or text secret; never written to config, logs or outputs
+  allow_ephemeral: true         # no key set -> random per-run key (consistent within a run only)
+
+date_shift:
+  scope: patient                # patient | note | global. Falls back to note when no patient id is known
+  min_days: -730
+  max_days: -30                 # never 0, so original dates are never emitted unchanged
+  # How to read ambiguous numeric dates like 05/03/2024: auto (decide per note from unambiguous dates such
+  # as 18/03/2024), true (day-first: India/UK) or false (month-first: US). Set true for Indian records.
+  day_first: auto
+
+# PERSON pseudonyms: link name variants ("Jane Q. Roe", "Jane Roe", "Roe", "Mr. Roe") to ONE pseudonym
+# within a note, and across notes of the same patient within a run (in-memory only, never stored).
+name_linking:
+  enabled: true
+
+retain_allowed: []              # e.g. [AGE] if the governing policy allows ages <= 89 to remain
+
+default:
+  action: redact
+  replacement: "[REDACTED]"
+
+categories:
+  PERSON:       {action: pseudonymize, prefix: PERSON}
+  DATE:         {action: date_shift, fallback: placeholder}
+  TIME:         {action: placeholder}
+  AGE:          {action: redact, replacement: "[AGE 90+]"}
+  ORGANIZATION: {action: placeholder}
+  LOCATION:     {action: placeholder}
+  PHONE:        {action: mask, keep_last: 0}
+  EMAIL:        {action: redact}
+  ID:           {action: pseudonymize, prefix: ID}
+  OTHER_PHI:    {action: redact}

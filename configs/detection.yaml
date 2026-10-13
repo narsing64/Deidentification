@@ -1,0 +1,58 @@
+# Shared detection pipeline settings: IDENTICAL for every model candidate (never tuned per model).
+# Changes to this file are experiment changes. Log them in docs/06_pipeline_changes.md with
+# validation evidence.
+
+# Offset-preserving typographic folding (deid.preprocessing.normalize). Experiment 6 ablation (M3):
+# no recall effect on this dataset and slightly lower precision -> OFF
+# (results/exp6_model_decoding/normalization_ablation.md). Kept configurable for other data.
+normalize_for_detection: false
+
+regex:
+  age_min: 90                      # HIPAA Safe Harbor: only ages > 89 are identifiers
+  disabled_rules: []
+  # Experiment 6 candidate rules (year_as_age, year_as_age_old, phone_intl, address_zip): listed here
+  # only once accepted (docs/06_pipeline_changes.md).
+  optional_rules: [address_zip]    # A7 accepted; year_as_age(_old) (A3), phone_intl (A4) rejected
+  # v2 (user request): many real hospital names have two words ("Medicover Hospitals", "KIMS Hospital"),
+  # so B3's ">= 3 words" is replaced by ">= 2 words + generic-word filter": a name made only of
+  # facility-type words ("Trauma Center", "Medical Center", "Primary Health Centre") is rejected.
+  org_min_words: 2
+  org_generic_filter: true
+  # Ordinary vocabulary (lower-case in >= 5 unlabelled notes; scripts/build_common_words.py). A name made
+  # only of such words ("Brief Hospital", "Admission Labs", "Cardiology Clinic") is not an organisation.
+  org_common_words: data/processed/common_lowercase_words.txt
+  # v3: editable public-name lists (whole-word, case-sensitive). Remove a line to disable a category.
+  gazetteers:
+    LOCATION: [configs/gazetteers/in_cities.txt]
+    ORGANIZATION: [configs/gazetteers/in_hospitals.txt]
+
+# Experiment 6 post-processing (src/deid/postprocess.py). Decisions: results/exp6_improvements/report.md
+postprocess:
+  min_model_score: 0.5             # B2 accepted (largest threshold meeting the pre-declared rule)
+  time_only_date_to_time: true     # A6 accepted (no measurable effect with regex fusion)
+  strip_person_titles: true        # A2 accepted
+  extend_person_names: false       # A1 rejected
+  # Experiment 13 (v4; decided on DEV data only: MIMIC validation + synthetic Indian dev)
+  drop_non_phi: true               # eponyms, degrees, durations as TIME, "15/15" as DATE, "108", generic ORG words
+  drop_state_names: true           # Safe Harbor allows states; "Andhra Pradesh" is not PHI
+  fix_person_initials: true        # "Anju N." keeps its full stop; "Ramesh V.", "N Kalaiselvi", "Mohd. Arif"
+  # Experiment 14 (v5; DEV data only: + Indian dev2 + Gretel validation)
+  trim_markup: true                # "Doe**" -> "Doe" (markdown / brackets at span edges)
+
+model:
+  # Word unit for first-sub-token labelling: "text" = whitespace chunks with edge punctuation peeled
+  # off (Experiment 6, change C1); "tokenizer" = the tokenizer's own pre-tokenised words (v1).
+  word_unit: text
+  # AGE scope (Experiment 6, change C2): 4-digit years labelled AGE -> DATE; ages < regex.age_min dropped.
+  age_scope: true
+  decision: argmax                 # argmax | o_threshold (entity if P(O) < o_threshold)
+  o_threshold: 0.5
+  # Rejoin pieces some models emit separately (first_name + last_name, street + city + zip),
+  # when separated only by whitespace (PERSON) or whitespace/commas (LOCATION).
+  merge_adjacent_categories: [PERSON, LOCATION]
+
+fusion:
+  # On conflicting labels, regex boundaries/labels win for these structured categories;
+  # model labels win otherwise. Coverage is never reduced (leftover fragments are kept).
+  regex_trusted_categories: [DATE, TIME, PHONE, EMAIL, ID, AGE, OTHER_PHI]
+  propagate_repeats: false         # also mark other exact occurrences of detected PERSON strings

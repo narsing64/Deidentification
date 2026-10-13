@@ -1,0 +1,45 @@
+# Indian hospital brands and institution acronyms (public names), label ORGANIZATION.
+# Used for STANDALONE mentions ("referred from AIIMS", "admitted at Apollo"); "<Name> Hospital(s)" is
+# already caught by the organisation suffix rule. Brands that are ordinary words ("Max", "Care",
+# "Rainbow", "Global", "Sunshine", "Continental") are deliberately excluded; use them with a suffix.
+AIIMS
+PGIMER
+NIMHANS
+JIPMER
+SGPGI
+SGPGIMS
+KGMU
+AFMC
+MAMC
+LNJP
+SCTIMST
+NIMS
+KIMS
+AIG Hospitals
+CMC Vellore
+CMC Ludhiana
+Tata Memorial
+Apollo
+Fortis
+Medanta
+Narayana Health
+Manipal Hospitals
+Breach Candy
+Wockhardt
+Medicover
+Aster CMI
+Aster DM
+Sahyadri
+Ruby Hall
+Sankara Nethralaya
+Aravind Eye
+L V Prasad
+LV Prasad
+MIOT
+Sir Ganga Ram
+Safdarjung
+Osmania General
+Gandhi Hospital
+Amrita Hospital
+Kasturba Hospital
+# Removed (also personal names / ordinary words; caught with a suffix instead): Yashoda, Lilavati, Kokilaben, Hinduja, Jaslok, Kamineni, Moolchand, Kauvery, Sri Ramachandra, St. John's (St. John's wort).

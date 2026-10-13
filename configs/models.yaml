@@ -1,0 +1,77 @@
+# Fixed shortlist (approved 2026-10-12). Do not add or swap models mid-benchmark without a
+# documented compatibility / licence / suitability failure (see docs/02_model_assessment.md).
+#
+# window_tokens / context_tokens: sliding-window inference. Each token is predicted from the window
+# where it sits in the central "core" (window - 2*context), so every prediction has >= context
+# tokens of left and right context except at document edges. Window sizes follow each model's
+# documented TRAINING length (obi: 128 incl. 32+32 context; OpenMed: 384; Stanford: undocumented,
+# so its 512 maximum is used). Context is 32 for obi (documented) and 64 otherwise.
+
+# Experiment 7 result (docs/07_model_selection.md). Used by the pipeline / run_deidentification.py.
+selected: openmed_fastclinical_82m
+
+# Section 11 result (results/exp9_optimization/report.openmed_fastclinical_82m.md): dynamic int8 ONNX accepted
+# (1.62x faster, combined strict recall -0.0011 within the pre-declared 0.002 tolerance); 8 threads gave no
+# further gain. Used by the pipeline (deployment=True). Create the file with:
+#   python scripts/optimize_model.py --model openmed_fastclinical_82m --configs onnx_int8:4:8
+deployment:
+  openmed_fastclinical_82m:
+    backend: onnx
+    onnx_path: .cache/onnx/openmed_fastclinical_82m/model.int8.onnx
+    threads: 4
+    batch_size: 8
+
+cache_dir: null          # null = use HF_HOME / default HF cache (yours: D:\hf_cache)
+torch_threads: 4         # fixed for all measurements
+batch_size: 8            # windows per forward pass
+
+shortlist:
+  - key: openmed_clinicale5_33m
+    hf_id: OpenMed/OpenMed-PII-ClinicalE5-Small-33M-v1
+    revision: 2ea947130eb28d610ceb96472af0b694fce9c344
+    label_schema: nemotron_pii
+    tag_scheme: BIO
+    window_tokens: 384
+    context_tokens: 64
+
+  - key: openmed_liteclinical_66m
+    hf_id: OpenMed/OpenMed-PII-LiteClinical-Small-66M-v1
+    revision: a6c3e2088a104d4b08034608347e4d26a4558b5d
+    label_schema: nemotron_pii
+    tag_scheme: BIO
+    window_tokens: 384
+    context_tokens: 64
+
+  - key: openmed_fastclinical_82m
+    hf_id: OpenMed/OpenMed-PII-FastClinical-Small-82M-v1
+    revision: 85d5bbaf4f5fcf2d04da9e4a1812d9c76386c72e
+    label_schema: nemotron_pii
+    tag_scheme: BIO
+    window_tokens: 384
+    context_tokens: 64
+
+  - key: obi_deid_bert_i2b2
+    hf_id: obi/deid_bert_i2b2
+    revision: d2c629e162c16be3a8ccc6e8e4a61405dde93cc2
+    label_schema: i2b2_2014
+    tag_scheme: BILOU
+    window_tokens: 128
+    context_tokens: 32
+
+  - key: stanford_deid_base
+    hf_id: StanfordAIMI/stanford-deidentifier-base
+    revision: 661b9c1c717d3165512d440abc3700c386aefab6
+    label_schema: stanford_deid
+    tag_scheme: IO
+    window_tokens: 512
+    context_tokens: 64
+
+# Pre-declared fallback, used ONLY if stanford_deid_base fails the Experiment 1 load check.
+fallbacks:
+  stanford_deid_base:
+    key: stanford_deid_v2
+    hf_id: StanfordAIMI/stanford-deidentifier-v2
+    label_schema: stanford_deid
+    tag_scheme: IO
+    window_tokens: 512
+    context_tokens: 64

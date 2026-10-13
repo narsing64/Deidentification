@@ -1,0 +1,140 @@
+{
+  "issues": {
+    "dev": {},
+    "test": {},
+    "dev2": {}
+  },
+  "stats": {
+    "dev": {
+      "notes": 100,
+      "spans": 2187,
+      "by_label": {
+        "PERSON": 524,
+        "LOCATION": 432,
+        "DATE": 321,
+        "ID": 269,
+        "PHONE": 241,
+        "TIME": 190,
+        "ORGANIZATION": 123,
+        "EMAIL": 61,
+        "AGE": 18,
+        "OTHER_PHI": 8
+      },
+      "by_doc_type": {
+        "discharge_corporate": 31,
+        "opd": 14,
+        "discharge_govt": 12,
+        "referral": 11,
+        "insurance": 10,
+        "lab": 8,
+        "nursing": 8,
+        "radiology": 4,
+        "obstetric": 1,
+        "death": 1
+      },
+      "by_region": {
+        "hindi": 20,
+        "marathi": 15,
+        "tamil": 10,
+        "kannada": 10,
+        "bengali_odia": 10,
+        "muslim": 9,
+        "telugu": 9,
+        "gujarati": 5,
+        "punjabi": 5,
+        "malayalam": 5,
+        "christian": 2
+      },
+      "mean_chars": 1406
+    },
+    "test": {
+      "notes": 200,
+      "spans": 4542,
+      "by_label": {
+        "PERSON": 1023,
+        "LOCATION": 861,
+        "DATE": 670,
+        "ID": 640,
+        "PHONE": 503,
+        "TIME": 421,
+        "ORGANIZATION": 229,
+        "EMAIL": 132,
+        "AGE": 45,
+        "OTHER_PHI": 18
+      },
+      "by_doc_type": {
+        "discharge_corporate": 58,
+        "insurance": 30,
+        "discharge_govt": 26,
+        "opd": 22,
+        "lab": 16,
+        "referral": 15,
+        "nursing": 15,
+        "death": 8,
+        "radiology": 8,
+        "obstetric": 2
+      },
+      "by_region": {
+        "hindi": 45,
+        "telugu": 32,
+        "malayalam": 22,
+        "tamil": 16,
+        "marathi": 16,
+        "kannada": 15,
+        "bengali_odia": 15,
+        "muslim": 14,
+        "gujarati": 9,
+        "punjabi": 9,
+        "christian": 7
+      },
+      "mean_chars": 1431
+    },
+    "dev2": {
+      "notes": 200,
+      "spans": 4305,
+      "by_label": {
+        "PERSON": 1008,
+        "LOCATION": 860,
+        "DATE": 674,
+        "ID": 568,
+        "PHONE": 429,
+        "TIME": 362,
+        "ORGANIZATION": 227,
+        "EMAIL": 120,
+        "AGE": 34,
+        "OTHER_PHI": 23
+      },
+      "by_doc_type": {
+        "discharge_corporate": 49,
+        "discharge_govt": 38,
+        "insurance": 23,
+        "opd": 21,
+        "referral": 19,
+        "lab": 17,
+        "nursing": 13,
+        "radiology": 11,
+        "obstetric": 5,
+        "death": 4
+      },
+      "by_region": {
+        "hindi": 43,
+        "tamil": 26,
+        "marathi": 26,
+        "telugu": 19,
+        "muslim": 18,
+        "bengali_odia": 18,
+        "malayalam": 15,
+        "gujarati": 15,
+        "kannada": 11,
+        "punjabi": 7,
+        "christian": 2
+      },
+      "mean_chars": 1394
+    }
+  },
+  "issue_examples": {
+    "dev": {},
+    "test": {},
+    "dev2": {}
+  }
+}
